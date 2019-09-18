@@ -61,3 +61,4 @@ class Signature(RSA):
 
 if __name__ == "__main__":
     Signature().handle_input()
+    # PYTHONHASHSEED=0
