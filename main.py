@@ -9,6 +9,8 @@ from math import gcd
 
 class Signature(RSA):
 
+    MARK = '\n\n---signature---\n'
+
     def __init__(self):
         super().__init__()
 
@@ -37,7 +39,21 @@ class Signature(RSA):
             RSA.save_to_file(self.output_file, data)
 
         elif self.file_to_decrypt is not None:
-            raise NotImplementedError('todo')
+            key = RSA.read_from_file(self.key_file_name + '.pub')
+            if not key:
+                raise FileNotFoundError('key is empty')
+            key = [int(x) for x in key.split('\n')]
+
+            data = RSA.read_from_file(self.file_to_decrypt)
+            data, sig = data.split(Signature.MARK)
+            hsh = RSA.encrypt(str(hash(data)), key)
+            if sig == hsh:
+                print('Signature verified')
+                RSA.save_to_file(self.output_file, data)
+            else:
+                print('SIGNATURE NOT VERIFIED')
+                data += Signature.MARK + 'SIGNATURE NOT VERIFIED\n'
+                RSA.save_to_file(self.output_file, data)
 
         else:
             raise RuntimeError('invalid input')
