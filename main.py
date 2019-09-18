@@ -25,7 +25,16 @@ class Signature(RSA):
             RSA.save_to_file(output_file, output_text)
 
         elif self.file_to_encrypt is not None:
-            raise NotImplementedError('todo')
+            key = RSA.read_from_file(self.key_file_name + '.prv')
+            if not key:
+                raise FileNotFoundError('key is empty')
+            key = [int(x) for x in key.split('\n')]
+
+            data = RSA.read_from_file(self.file_to_encrypt)
+            sig = hash(data)
+            sig = RSA.encrypt(str(sig), key)
+            data += Signature.MARK + sig
+            RSA.save_to_file(self.output_file, data)
 
         elif self.file_to_decrypt is not None:
             raise NotImplementedError('todo')
